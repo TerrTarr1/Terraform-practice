@@ -21,22 +21,3 @@ terraform apply
 terraform state list
 terraform state show aws_s3_bucket.terraform_bucket
 # or terraform state show $(terraform state list | grep terraform_bucket)
-
-
-
-# provider는 인프라의 종류를 의미합니다
-# profile이 있다면 profile을 입력해주고 없다면 주석처리합니다.
-# 해당설정이 있을경우에는 ~/.aws/config의 프로필을 따라가고
-# 해당설정이 없는경우 ~/.aws/credentials를 따라갑니다.
-# resource는 인프라 자원을 의미합니다
-# aws_s3_bucket이라는 인프라 자원의 이름을 terraform_bucket로 설정(내 소스코드에서 사용되는 리소스의 이름)
-# bucket의 이름은 my-terraform-bucket-01으로 생성하라는 설정입니다
-
-# terraform init을 하게되면 provider, module, state 등의 설정을 진행합니다.
-# terraform plan을 입력하면 테라폼코드가 적용되면 어떤 변경사항이 일어날지 확인해줍니다.
-# terraform apply는 실제 인프라에 적용하는 명령어 입니다.
-
-# list 옵션을 통해 현재 state파일이 가지고있는 리소스를 확인할 수 있습니다.
-# 위에서 나온 결과값을 show 옵션의 아규먼트로 보내면 state파일의 정보를 확인할 수 있습니다.
-
-# 리소스를 주석처리하고 terraform plan, terraform apply를 하면 테라폼으로 생성했던 리소스는 삭제됩니다 
