@@ -1,0 +1,32 @@
+### Test 1 ###
+
+provider "aws" {  
+  region = "ap-northeast-2"
+  }
+
+resource "aws_s3_bucket" "this" {
+  count = 3                               # count라는 필드는 내부적으로 반복되는 특징이 있어서 이런식으로 사용하게되면 버킷이 3개 생성되게 됩니다.
+  bucket = "frozen-bucket-${count.index}"
+}
+
+:wq
+  
+  
+  
+### Test 2 ###
+  
+provider "aws" {
+  region = "ap-northeast-2"
+  }
+
+resource "aws_s3_bucket" "this" {
+  count = var.needBucket? 1 : 0          # count에 삼항연산자를 사용하여 1이나 0을 줬습니다.
+  bucket = "frozen-bucket"               #needBucket이 true면 버킷이 한개 만들어지고, false라면 count가 0이 되어 해당 블록은 동작하지 않게 됩니다.
+  }
+
+variable "needBucket" {
+  type = bool
+  default = false
+  }
+
+:wq
