@@ -1,0 +1,23 @@
+resource "aws_s3_bucket" "this" {           # 내부 블락을 여러개 만들때 사용하기
+  bucket = "frozen-bucket"
+  dynamic "lifecycle_rule" {
+    for_each = var.my_lifecycle_rule
+    content {
+      id      = lifecycle_rule.value["id"]
+      enabled = lifecycle_rule.value["enabled"]
+    }
+  }
+}
+
+variable "my_lifecycle_rule" {
+  default = [
+    {
+      id : "first_rule",
+      enabled = true,
+    },
+    {
+      id : "second_rule",
+      enabled = true
+    }
+  ]
+}
