@@ -1,0 +1,33 @@
+# hashmap의 자료구조를 사용할때는 key가 있는지 검증해줘야 합니다.
+# 누군가 variable을 사용할때 enabled 필드를 빼먹었다면 python이라면 아래의 소스코드의 과정이 필요합니다.
+# python
+for my_lifecycle_rule in my_lifecycle_rules:
+  if "enabled" not in my_lifecycle_rule.keys():
+    my_lifecycle_rule["enabled"] = true
+    
+    
+# 테라폼코드에서는 lookup을 사용합니다.
+resource "aws_s3_bucket" "this" {
+  bucket = "rookie-terraform-bucket"
+  dynamic "lifecycle_rule" {
+    for_each = var.my_lifecycle_rule
+    content {
+      id      = lifecycle_rule.value["id"]
+      // key를 빼먹은경우 default를 true로 지정하겠습니다.
+      enabled = lookup(lifecycle_rule.value, "enabled", true)
+    }
+  }
+}
+
+variable "my_lifecycle_rule" {
+  default = [
+    {
+      id : "first_rule",
+      enabled = true,
+    },
+    {
+      id : "second_rule",
+      // 누군가 enabled를 빼먹은상황
+    }
+  ]
+}
