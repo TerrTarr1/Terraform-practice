@@ -1,0 +1,70 @@
+### Data source 문법, instance 참조
+# Data source 는 Terraform 을 사용하지 않고 만든 infrastructure resource 또는 다른 곳에서 사용중인 Terraform code 를 통해 만들어진 resource 의 Data 를 가져오는데 사용된다.
+# 각각의 provider 들은 resource 와 함께 data source 도 제공하고 있다.
+
+data "aws_iam_user" "foo" {
+  user_name = "foo_name"
+}
+
+resource "aws_iam_user" "bar" {                 # 코드의 첫번째 라인처럼 data block 을 통해 원하는 type 의 data 를 가져올 수 있다.
+  name = "bar_name"                             # 예제 코드에서는 user_name 이 foo_name 인 aws_iam_user 의 data 를 가져오도록 하였고 foo 라는 이름을 붙혀줬다.
+  path = data.aws_iam_user.foo.path
+}
+
+# 이처럼 data 를 가져오기 위해서는 data block 안에 정보들(Arguments)을 명시해줘야 하는데, 이 Arguments 에 대한 내용은 각각의 Provider document 페이지에서 확인할 수 있다.
+# resource 사용법과 동일하게 data.<TYPE>.<NAME>.<ATTRIBUTE> 문법을 사용하여 가져올 수 있으며, 
+# 위의 예제에서는 resource block 내에서 data.aws_iam_user.foo.path 를 사용하여 foo iam user 의 path 값을 가져왔다.
+
+===============================================================================================================
+
+### filter block
+# filter 란 용어 그대로 가져온 Data instance 중 원하는 Data instance 를 얻고자 할때 사용된다.
+
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+}
+
+resource "aws_instance" "example" {
+  ami           = data.aws_ami.amazon_linux_2.id
+  instance_type = "t3.micro"
+}
+# data block 을 통해 aws_ami 를 가져오고 있으며, "name" 이란 filter 를 통해 "amzn2-ami-hvm*" 에 해당하는 Data instance 를 가져온다. (이와 같이 정규식의 사용도 가능하다.)
+# most_recent 와 함께 사용하였으므로 이 data block 을 통해 가장 최신의 Amazon Linux 2 AMI 를 가져올 수 있다.
+
+
+# filter 는 아래 예시와 같이 여러개의 block 을 명시한다면 AND type 으로 동작하고,
+filter {
+  name   = "name"
+  values = ["amzn2-ami-hvm*"]
+}
+
+filter {
+  name   = "virtualization-type"
+  values = ["hvm"]
+}
+# 아래 예시와 같이 한개의 block 에서 여러개의 values 를 명시한다면 OR type 으로 동작한다.
+filter {
+  name   = "name"
+  values = ["amzn2-ami-hvm*", "ubuntu-*"]
+}
+
+===============================================================================================================
+
+### Local-only data sources
+# 일부 Data source 중에는 remote infrastructure 에서 data 를 가져오는 것이 아니라, local 에서 처리한뒤 data instance 를 생성하는 것들이 있다.
+# [template_file] - document page
+#.tpl 파일인 template file 을 가져와서 data instance 로 만들어 rendered template 을 참조하고자 할때 쓰는 data source 이다.
+# 하지만 Terraform 0.12 이상 버전부터 deprecate 되었고 templatefile function 을 사용해서 동일한 동작을 수행할 수 있으므로 0.11 이하의 버전을 사용하지 않는다면 딱히 쓸일은 없다.
+
+# [local_file] - document page
+# Local 에 있는 file 을 data instance 로 생성하여 해당 파일의 content 또는 base64 로 encoding 된 content 를 참조할 수 있도록 해주는 Data source 이다.
+
+# [aws_iam_policy_document] - document page
+# aws_iam_policy resource 를 생성할때 사용할 policy 를 생성해주는 Data source 이다.
+# Arguments 들을 통해 data instance 를 생성하면 json 으로 변환된 값을 참조할 수 있다.
