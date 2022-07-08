@@ -1,0 +1,30 @@
+# resource block 안에는 해당 resource 를 생성하기 위한 정보인 arguments 가 들어간다.
+# 예제를 보면 name = "example" 이렇게 선언이 되어있는데 IAM user 의 이름을 "example" 로 하겠다는 뜻이다.
+# 각기 다른 Arguments 외에 모든 resource 가 공통적으로 사용 할 수 있는 Arguments 가 있는데, 이걸 Meta-Arguments 라고 부른다.
+
+### Meta-Arguments 종류 ###
+### depends_on
+#d epends_on 이란 이름 그대로 특정 resource 에 dependency 를 설정해 줄때 사용하는 arguments 이다.
+# 쉽게 생각하면 dependency 를 설정함으로써 resource 들의 실행 순서를 정해줄 수 있다.
+# example) S3 bucket 하나와 EC2 instance 하나를 생성해야 하고, EC2 instance 생성 시 S3 에 파일을 push 하는 작업을 수행해야 한다.
+# 그렇다면 여기에서 가장 중요하게 고려해야 할 상황은 EC2 가 생성되기 전에 S3 bucket 이 생성 완료되야 파일을 push 하는 작업을 문제 없이 수행할 수 있다는 점이다.
+# depends_on block 안에 aws_s3_bucket.example 을 선언함으로써 aws_instance.example resource 는 aws_s3_bucket.example resource 에 dependency 를 가지고 있다고 terraform 에게 명시적으로 알려주게 된다.
+# 따라서 aws_s3_bucket.example resource 가 생성이 완료 된 후에 aws_instance.example resource 가 생성을 시작하게 된다.
+=========================================================================
+resource "aws_s3_bucket" "example" {
+  bucket = "example"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-example"
+  instance_type = "t2.micro"
+  # 위에서 생성한 S3 에 파일을 push 하는 작업을 수행하는 user data
+  user_data     = "...."
+
+  depends_on = [
+      aws_s3_bucket.example
+  ]
+}
+=========================================================================
+# 그렇다고 모든 terraform resource 를 생성할때 dependency 를 고려하여 depends_on 을 추가해야한다는 건 절대 아니다.
+# depends_on 은 resource 간의 dependency 설정이 필요한데 terraform 이 자동으로 dependency 를 알기 어려운 경우에만 사용해주면 된다.
