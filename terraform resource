@@ -42,6 +42,39 @@ resource "aws_iam_user" "example" {
 # 기존에 우리는 생성된 resource 를 참조하기 위해 <RESOURCE TYPE>.<NAME> 문법을 사용하여 aws_iam_user.example 이런식으로 사용을 했다.
 # 하지만 count argument 를 사용하여 생성한 resource 를 참조하기 위해서는 <TYPE>.<NAME>[<INDEX>] 문법을 사용하여 resource 의 index 를 명시해 줘야 한다.
 # aws_iam_user.example[0] 이런 식으로 참조를 할 수 있으며 예를 들어 이름을 참조하고 싶다면 aws_iam_user.example[0].name, aws_iam_user.example[1].name 등등 만들어진 count 에 따라 index 를 함께 명시함으로써 참조가 가능하다.
-# 주의해야할 점은 count argument 의 값은 apply 전에 정해져 있어야 한다.
-# count = aws_iam_user.example.name == "" : 0 : 1 이렇게 count 값에 apply 후에 가져올 수 있는 resource 의 attribute 를 참조하는 코드가 있다거나 하면 terraform 에서는 error 를 발생시킨다.
+# 주의해야할 점 : count argument 의 값은 apply 전에 정해져 있어야 한다. count = aws_iam_user.example.name == "" : 0 : 1 이렇게 count 값에 apply 후에 가져올 수 있는 resource 의 attribute 를 참조하는 코드가 있다거나 하면 terraform 에서는 error 를 발생시킨다.
 
+### for_each
+# meta-argument 로 count 와 동일하게 한개의 resource block 으로 여러개의 동일한 resource type 을 생성하고자 할때 사용한다.
+# count 와 for_each 는 resource block 에서 동시에 사용할 수 없으므로 한개만 선택해서 사용하도록 한다.
+# for_each 는 map 또는 set 을 값으로 가질 수 있으며 map 또는 set 을 통해 전달된 값의 갯수만큼 resource 를 생성한다.
+=========================================================================
+# Using set
+resource "aws_iam_user" "example1" {
+  for_each = toset(["user1", "user2", "user3"])
+  name     = each.key
+}
+
+# Using map
+resource "aws_iam_user" "example2" {
+  for_each = {
+    user4 = "tag4"
+    user5 = "tag5"
+    user6 = "tag6"
+  }
+  name     = each.key
+  tags     = {
+    example = each.value
+  }
+}
+=========================================================================
+# 먼저 첫번째 example1 resource 는 set 을 사용하여 user1, user2, user3 총 3개의 IAM user 를 만드는 코드이다.
+# 두번째 example2 resource 는 map 을 사용하여 user4, user5, user6 총 3개의 IAM user 를 각각 tag4, tag5, tag6 태그와 함께 생성하는 코드이다.
+# for_each 를 사용하여 resource 를 생성하면, each object 를 resource block 내에서 사용할 수 있다.
+# each object 를 통해 each.key, each.value 를 사용할 수 있다.
+# each.key 는 map 을 사용시에는 key 값을, set 을 사용시에는 member 값을 의미한다.
+# each.value 는 map 을 사용사에는 value 값을, set 을 사용시에는 each.key 와 동일하게 member 값을 의미한다.
+# for_each 를 사용하여 생성한 resource 를 참조하기 위해서는 <TYPE>.<NAME>[<KEY>] 문법을 사용한다.
+# set 을 사용한 resource 참조를 위해서는 aws_iam_user.example1["user2"].name, aws_iam_user.example1["user3"].name 이런식으로 사용하면 되고,
+# map 을 사용한 resource 참조도 동일하게 aws_iam_user.example1["user4"].name, aws_iam_user.example1["user5"].name 이런식으로 가능하다.
+# 주의할점 : count argument 와 마찬가지로 for_each 의 값도 apply 전에 정해져 있어야 한다. 그렇지 않으면 apply 시 error 가 발생하니 주의하기 바란다.
