@@ -72,7 +72,7 @@ resource "aws_iam_user" "example2" {
     example = each.value
   }
 }
-=========================================================================
+==========================================================================
 # 먼저 첫번째 example1 resource 는 set 을 사용하여 user1, user2, user3 총 3개의 IAM user 를 만드는 코드이다.
 # 두번째 example2 resource 는 map 을 사용하여 user4, user5, user6 총 3개의 IAM user 를 각각 tag4, tag5, tag6 태그와 함께 생성하는 코드이다.
 # for_each 를 사용하여 resource 를 생성하면, each object 를 resource block 내에서 사용할 수 있다.
