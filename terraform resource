@@ -117,3 +117,60 @@ resource "aws_instance" "ap-northeast-2" {
 # aws_instance.ap-northeast-2 resource 는 provider = aws.seoul 을 선언하여 seoul 이라는 alias 를 가지는 alternate configuration 을 사용하여 ap-northeast-2 region 에 EC2 instance 를 생성하게 된다.
 
 
+
+### lifecycle
+# lifecycle meta-argument 는 resource 의 create, update, destroy 에 관여하여 해당 동작의 수행을 우리가 원하는 방식으로 변경할때 사용하는 argument 이다.
+# lifecycle 내에서 사용할 수 있는 argument 에는 총 3가지가 있다.
+=========================================================================
+resource "aws_instance" "example1" {
+  ami           = "ami-example"
+  instance_type = "t2.micro"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_instance" "example2" {
+  ami           = "ami-example"
+  instance_type = "t2.micro"
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_instance" "example3" {
+  ami           = "ami-example"
+  instance_type = "t2.micro"
+  tags          = {
+    name = "example3"
+  }
+  lifecycle {
+    ignore_changes = [
+      instance_type,
+      tags
+    ]
+  }
+}
+
+resource "aws_instance" "example4" {
+  ami           = "ami-example"
+  instance_type = "t2.micro"
+  lifecycle {
+    ignore_changes = all
+  }
+}
+=========================================================================
+# create_before_destroy
+    Terraform 에서는 특정 resource 에 대해 update 를 해야하나 제약사항에 의해 update 가 불가능한 경우 만들어진 resource 를 삭제하고 update 된 resource 를 새로 만드는 것이 기본 동작이다.
+    create_before_destroy argument 는 bool 값을 가지며 true 로 설정하면 이런 경우 먼저 update 된 resource 를 생성하고 기존의 resource 를 삭제하는 방식으로 동작하도록 할 수 있다.
+    단 이 동작을 수행하고자 하는 resource 의 type 에 따라 unique constraint 등 다른 제약들이 있어 불가능한 경우가 있으니, 사용전 확인해보고 사용을 하는걸 추천한다.
+
+# prevent_destroy
+    Terraform 을 사용하여 생성된 resource 들 중 destroy 가 되는걸 방지하고 할때 사용하는 argument 이다.
+    prevent_destroy 는 bool 값을 가지며 true 로 설정하면 resource 가 destroy 되려고 할때 error 를 던진다. (terraform destroy 시에도 적용이 된다.)
+
+# ignore_changes
+    Terraform 을 사용하여 infrastructure 구축 시 terraform 은 실제 적용되어 있는 resource 들의 값과 code 로 작성되어 적용하고자 하는 값들을 비교하여 해당 resource 의 create, update, destroy 를 결정한다.
+    ignore_changes 는 list 값을 가지며 list 에 적은 arguments 를 terraform 이 비교하는 대상에서 제외시켜 update 를 하지 않는다.
+    비교 대상에서 제외하고자 하는 값을 list 안에 넣어주면 되고, 혹시 모든 arguments 를 비교대상에서 제외하고자 한다면 example4 의 예처럼 list 대신 all 값을 선언해주면 된다
+
