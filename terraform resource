@@ -159,7 +159,7 @@ resource "aws_instance" "example4" {
     ignore_changes = all
   }
 }
-=========================================================================
+==========================================================================
 # create_before_destroy
     Terraform 에서는 특정 resource 에 대해 update 를 해야하나 제약사항에 의해 update 가 불가능한 경우 만들어진 resource 를 삭제하고 update 된 resource 를 새로 만드는 것이 기본 동작이다.
     create_before_destroy argument 는 bool 값을 가지며 true 로 설정하면 이런 경우 먼저 update 된 resource 를 생성하고 기존의 resource 를 삭제하는 방식으로 동작하도록 할 수 있다.
