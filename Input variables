@@ -1,0 +1,47 @@
+# Input variables 란 모듈에 제공되는 변수이며, 모듈의 source code 의 변경 없이 모듈을 customize 할 수 있도록 해준다.
+# 쉽게 생각해서 일반적인 프로그래밍을 생각한다면 함수에 전달되는 전달 인자라고 보면 될 것 같다.
+============================================================================================
+variable "iam_user_name" {
+  type        = string
+  default     = "iam-user-name"
+  description = "IAM user name"
+
+  validation {
+    condition     = length(var.iam_user_name) > 5 && substr(var.iam_user_name, 0, 4) == "iam-"
+    error_message = "IAM user name must be longer than 5 characters and starting with \"iam-\"."
+  }
+}
+============================================================================================
+# condition 을 보면 iam_user_name 의 길이가 5자리 이상이어야 하고, iam- 으로 시작되어야 한다고 조건을 걸어 주었다.
+# 입력받은 값이 이 조건을 false 로 return 한다면 아래의 error_message(IAM user name must be longer...) 를 보여주며 종료될 것이다.
+
+# 위의 예제처럼 variable block 을 통해 Input variables 를 선언할 수 있고, "iam_user_name" 처럼 variable 의 이름을 지정 해 줄 수 있다.
+# variables 의 이름은 value 를 할당하거나 다른곳에서 참조를 할때 사용이 되며, 다른 variable 의 이름과 중복이 되어서는 안된다.
+
+
+
+# 모든 Arguments 에 대해서 알아보자. optional 이므로 사용하지 않아도 문제는 없다
+### Arguments
+# default - variable 의 default 값을 지정해줄때 사용된다.
+  variable 의 값을 지정해주지 않았을 경우 default 값이 사용되고,
+  default argument 를 사용하지 않는다면 해당 variable 의 값을 반드시 지정해줘야 한다.
+
+# type - 값의 type 을 지정하여 해당 type 으로만 값의 할당을 제한하고자 할때 사용된다.
+  string, number, bool 을 기본으로 사용할 수 있고 list, set, map, object, tuple 도 사용이 가능하다.
+  any 도 사용이 가능한데 단어 그대로 어떤 type 의 값이든 할당이 가능하도록 하고자 할때 사용된다.
+  any type 을 사용하면 Terraform 이 알아서 적절한 type 으로 converting 을 해준다.
+  하지만 반드시 필요한 경우가 아니라면 any type 보다는 특정한 type 을 지정하여 값의 할당을 제한한다면 개발 과정에서 나올 수 있는 실수를 줄일 수 있으므로, 되도록 any type 의 사용은 지양하는 것이 좋을 것 같다.
+  type argument 를 사용하지 않는다면 any type 으로 사용되게 된다.
+
+# description - variable 에 대해 설명을 추가하고자 할때 사용한다.
+
+# validation - type 을 통해 값의 type 을 제한할 수 있었다면, validation 은 조금 더 custom 하게 값을 제한할 수 있도록 도와준다.
+  variable block 내의 validation block 을 통해 생성할 수 있으며 condition, error_message 2개의 arguments 를 가진다.
+  value 가 condition 의 표현식을 통해 true 를 return 한다면 valid 한 값으로 사용할 수 있고, false 를 return 한다면 Terraform 에서 Error 를 발생시키고 error_message 를 개발자에게 보여준다.
+
+
+
+
+
+
+
