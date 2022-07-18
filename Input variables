@@ -151,3 +151,37 @@ $ terraform apply -var-file="test1.tfvars" -var-file="test2.tfvars"
     "iam_user_name": "iam-test"
 }
 ============================================================================================
+
+
+
+### 환경변수를 통한 할당
+# variable 을 환경변수로 선언하여 값을 할당하는 방법도 가능하다.
+# TF_VAR_ 로 시작해야하며 뒤에 variable 의 이름을 붙힌뒤 값을 할당할 수 있다.
+# 위의 예제에서 사용한 iam_user_count variable 을 할당하고자 한다면, 아래와 같이 할 수 있다.
+============================================================================================
+$ export TF_VAR_iam_user_count=2
+$ terraform apply
+...
+============================================================================================
+
+### 값 할당 순서
+1.환경변수
+2.terraform.tfvars 파일
+3.terraform.tfvars.json 파일
+4.*.auto.tfvars 또는 *.auto.tfvars.json 파일중 사전식 순서대로
+5.Command Line 의 -var 또는 -var-file 옵션을 명시된 순서대로
+
+# Terraform 은 위의 순서대로 값을 읽으며 값은 계속 Overwrite 되므로 가장 마지막에 나온 값이 사용되게 된다.
+# 예를 들어 동일한 variable 값이 환경변수, terraform.tfvars 에 동시에 할당되어 있다면 마지막에 읽은 값인 terraform.tfvars 에 있는 값으로 할당이 된다.
+# *.auto.tfvars 또는 *.auto.tfvars.json 파일이 여러개인 경우에는 사전식 순서대로 값을 읽게되어 동일한 variable이 있다면 가장 사전식 순서가 늦은 파일의 값이 사용된다.
+# Command Line 옵션을 사용하는 경우에도 마찬가지로 값은 명령어의 정의된 제일 마지막 순서의 값이 사용된다.
+
+# 한가지 헷갈리지 말아야할건 마지막으로 읽은 파일의 값만 사용하는 것이 아니라 값을 읽는 순서대로 계속 값을 Overwrite 한다는 것이다.
+# 만약 a.auto.tfvars 에 A 라는 variable 의 값이, b.auto.tfvars 에 B 라는 varialbe 의 값이 있다면,
+# b.auto.tfvars 파일만 사용해서 값을 할당하는게 아니라 a.auto.tfvars 에서 A 값을 할당하고, b.auto.tfvars 에서는 A 값이 없으므로 B 값만 할당해서 결국 A, B 모두 할당이 되는 것이다.
+
+# 지금까지 Input variables에 대하여 살펴보았다.
+# Infrastructure 를 code 로 관리할때 가장 좋은 장점 중 하나가 한번 작성한 code 로 재활용이 가능 하다는 점이다.
+# 물론 동일한 코드를 완전히 그대로 사용하여 새로운 infrastructure 를 구성하는 경우도 있겠지만,
+# 조금씩 다른 설정으로 infrastructure 를 생성하는 경우도 굉장히 많으므로 적재 적소에 Input variables 를 잘 사용하여 조금 더 쉽게 재활용이 가능한 코드를 작성하는 것이 중요하다.
+
