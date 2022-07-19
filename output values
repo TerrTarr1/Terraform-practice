@@ -1,0 +1,49 @@
+# Output values 란 모듈에서 제공하는 값이며, 다른 모듈에서 그 값을 다양하게 사용하여 Infrastructure 구성에 도움을 준다.
+# 모듈의 return value 라고 생각하면 쉬울 것 같다.
+
+====================================================================
+# main.tf
+resource "aws_iam_user" "example" {
+  name  = "test"
+}
+# outputs.tf
+output "user_name" {
+  value       = aws_iam_user.example.name
+  description = "IAM user name"
+}
+
+output "user_arn" {
+  value       = aws_iam_user.example.arn
+  description = "IAM user arn"
+}
+
+output "custom_name" {
+  value       = "custom-${aws_iam_user.example.name}"
+  description = "IAM user custom name"
+}
+
+output "hello" {
+  value       = "hello"
+  description = "hello string"
+}
+====================================================================
+# Output values 는 보통 outputs.tf 파일을 생성하여 선언하며 (물론 파일 이름은 개발자 자유이다) output block 을 통해 생성할 수 있다.
+# output 의 이름은 다른 것들과 마찬가지로 다른 output 의 이름과 중복 되어서는 안된다.
+# 사용할 수 있는 Arguments 에 대해서 살펴보면
+
+  ### value - output 으로 사용할 값을 명시해준다. string, number, list 등등 다양한 type 을 가질 수 있다.
+
+  ### description - output 에 대한 설명이다.
+  # 만약 모듈을 만들어 배포한다면 description 에 적은 내용이 문서에 나타나 모듈 사용자들이 참고하게 되므로 사용자를 위한 내용을 적는 걸 추천한다.
+
+  ### depends_on - 일반적으로 Terraform 이 알아서 처리해주기 때문에 필요가 없지만 특별한 경우 dependencies 가 필요할때 depends_on 을 사용하여 처리 순서를 보장할 수 있다.
+  # value를 제외한 모든 Arguments 는 optional 이므로 사용하지 않아도 문제는 없다.
+
+
+
+
+
+
+
+
+
