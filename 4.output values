@@ -37,8 +37,70 @@ output "hello" {
   # 만약 모듈을 만들어 배포한다면 description 에 적은 내용이 문서에 나타나 모듈 사용자들이 참고하게 되므로 사용자를 위한 내용을 적는 걸 추천한다.
 
   ### depends_on - 일반적으로 Terraform 이 알아서 처리해주기 때문에 필요가 없지만 특별한 경우 dependencies 가 필요할때 depends_on 을 사용하여 처리 순서를 보장할 수 있다.
-  # value를 제외한 모든 Arguments 는 optional 이므로 사용하지 않아도 문제는 없다.
+ 
+# value를 제외한 모든 Arguments 는 optional 이므로 사용하지 않아도 문제는 없다.
 
+
+### 사용방법
+# 위에 있는 예제 파일을 생성하고 terraform init 이후 terraform apply 를 실행해 보자. 아래와 같은 출력 결과를 얻을 수 있다.
+====================================================================
+$ terraform apply
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_iam_user.example will be created
+  + resource "aws_iam_user" "example" {
+      + arn           = (known after apply)
+      + force_destroy = false
+      + id            = (known after apply)
+      + name          = "test"
+      + path          = "/"
+      + unique_id     = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + custom_name = "custom-test"
+  + hello       = "hello"
+  + user_arn    = (known after apply)
+  + user_name   = "test"
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+aws_iam_user.example: Creating...
+aws_iam_user.example: Creation complete after 2s [id=test]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+custom_name = custom-test
+hello = hello
+user_arn = arn:aws:iam::111111111111:user/test
+user_name = test
+====================================================================
+# terraform apply 명령어를 통해 "test" IAM user 를 하나 만들었고, 그 이후 코드에서 선언해 놓은 4개의 outputs 가 출력된 걸 볼 수 있다.
+
+  # user_name - aws_iam_user.example.name 을 통해 생성된 user 의 name 을 가져와서 출력해 주었으므로 test 가 출력되었다.
+
+  # user_arn - aws_iam_user.example.arn 을 통해 생성된 user 의 arn 을 가져와서 출력해 주었으므로 arn:aws:iam::111111111111:user/test 가 출력되었다.
+
+  # custom_name - custom- string 에 aws_iam_user.example.name 을 더한 결과를 출력해 주었으므로 custom-test 가 출력되었다.
+
+  # hello - 단지 hello 라는 string 을 출력해주는 output 이므로 hello 가 출력되었다.
+
+
+# 사용법은 이렇게 간단하고 value 에는 다양한 type 이 가능하므로 필요에 맞게 설정 후 사용하면 된다. 
+# (함수 사용도 가능하므로 함께 이용하면 원하는 output 을 출력하는데 도움이 될 것이다.)
 
 
 
