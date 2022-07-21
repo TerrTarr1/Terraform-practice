@@ -12,7 +12,7 @@
 # 그렇다면 여기에서 가장 중요하게 고려해야 할 상황은 EC2 가 생성되기 전에 S3 bucket 이 생성 완료되야 파일을 push 하는 작업을 문제 없이 수행할 수 있다는 점이다.
 # depends_on block 안에 aws_s3_bucket.example 을 선언함으로써 aws_instance.example resource 는 aws_s3_bucket.example resource 에 dependency 를 가지고 있다고 terraform 에게 명시적으로 알려주게 된다.
 # 따라서 aws_s3_bucket.example resource 가 생성이 완료 된 후에 aws_instance.example resource 가 생성을 시작하게 된다.
-=========================================================================
+=======================================================================
 resource "aws_s3_bucket" "example" {
   bucket = "example"
 }
@@ -27,7 +27,7 @@ resource "aws_instance" "example" {
       aws_s3_bucket.example
   ]
 }
-=========================================================================
+=======================================================================
 # 그렇다고 모든 terraform resource 를 생성할때 dependency 를 고려하여 depends_on 을 추가해야한다는 건 절대 아니다.
 # depends_on 은 resource 간의 dependency 설정이 필요한데 terraform 이 자동으로 dependency 를 알기 어려운 경우에만 사용해주면 된다.
 
@@ -36,12 +36,12 @@ resource "aws_instance" "example" {
 ### count
 # 일반적으로 resource block 을 통해 resource 를 생성하면 1개의 resource 가 생성이 되는데, 
 # 동일한 resource block 으로 여러개의 동일한 resource type 을 생성하고 싶을때 사용하는 argument 가 count 이다.
-=========================================================================
+=======================================================================
 resource "aws_iam_user" "example" {
   count = 3
   name  = "example_${count.index}"
 }
-=========================================================================
+=======================================================================
 # 기존에 우리는 생성된 resource 를 참조하기 위해 <RESOURCE TYPE>.<NAME> 문법을 사용하여 aws_iam_user.example 이런식으로 사용을 했다.
 # 하지만 count argument 를 사용하여 생성한 resource 를 참조하기 위해서는 <TYPE>.<NAME>[<INDEX>] 문법을 사용하여 resource 의 index 를 명시해 줘야 한다.
 # aws_iam_user.example[0] 이런 식으로 참조를 할 수 있으며 예를 들어 이름을 참조하고 싶다면 aws_iam_user.example[0].name, aws_iam_user.example[1].name 등등 만들어진 count 에 따라 index 를 함께 명시함으로써 참조가 가능하다.
@@ -53,7 +53,7 @@ resource "aws_iam_user" "example" {
 # meta-argument 로 count 와 동일하게 한개의 resource block 으로 여러개의 동일한 resource type 을 생성하고자 할때 사용한다.
 # count 와 for_each 는 resource block 에서 동시에 사용할 수 없으므로 한개만 선택해서 사용하도록 한다.
 # for_each 는 map 또는 set 을 값으로 가질 수 있으며 map 또는 set 을 통해 전달된 값의 갯수만큼 resource 를 생성한다.
-=========================================================================
+=======================================================================
 # Using set
 resource "aws_iam_user" "example1" {
   for_each = toset(["user1", "user2", "user3"])
@@ -72,7 +72,7 @@ resource "aws_iam_user" "example2" {
     example = each.value
   }
 }
-==========================================================================
+========================================================================
 # 먼저 첫번째 example1 resource 는 set 을 사용하여 user1, user2, user3 총 3개의 IAM user 를 만드는 코드이다.
 # 두번째 example2 resource 는 map 을 사용하여 user4, user5, user6 총 3개의 IAM user 를 각각 tag4, tag5, tag6 태그와 함께 생성하는 코드이다.
 # for_each 를 사용하여 resource 를 생성하면, each object 를 resource block 내에서 사용할 수 있다.
@@ -88,7 +88,7 @@ resource "aws_iam_user" "example2" {
 
 ### provider
 # AWS infrastructure 를 구성하다보면 종종 다른 configuration 을 가지고 (예를 들면 다른 region) resource 를 생성해야 하는 경우가 생긴다. 그럴 때 provider 쓴다.
-=========================================================================
+=======================================================================
 # default
 provider "aws" {
   region = "us-east-1"
@@ -110,7 +110,7 @@ resource "aws_instance" "ap-northeast-2" {
   ami           = "ami-example"
   instance_type = "t2.micro"
 }
-=========================================================================
+=======================================================================
 # us-east-1 region 을 사용하는 default configuration 한개와 ap-northeast-2 region 을 사용하는 alternate configuration 한개가 있다.
 # provider 당 default configuration 은 반드시 1개만 선언할 수 있기 때문에 ap-northeast-2 region 을 사용하는 configuration 은 alias 를 선언하여 alternate 로 만들어 주었다.
 # aws_instance.us-east-1 resource 는 provider 를 선언하지 않았기 때문에 default configuration 을 사용하여 us-east-1 region 에 EC2 instance 를 생성하고,
@@ -121,7 +121,7 @@ resource "aws_instance" "ap-northeast-2" {
 ### lifecycle
 # lifecycle meta-argument 는 resource 의 create, update, destroy 에 관여하여 해당 동작의 수행을 우리가 원하는 방식으로 변경할때 사용하는 argument 이다.
 # lifecycle 내에서 사용할 수 있는 argument 에는 총 3가지가 있다.
-=========================================================================
+=======================================================================
 resource "aws_instance" "example1" {
   ami           = "ami-example"
   instance_type = "t2.micro"
@@ -159,7 +159,7 @@ resource "aws_instance" "example4" {
     ignore_changes = all
   }
 }
-==========================================================================
+========================================================================
 # create_before_destroy
     Terraform 에서는 특정 resource 에 대해 update 를 해야하나 제약사항에 의해 update 가 불가능한 경우 만들어진 resource 를 삭제하고 update 된 resource 를 새로 만드는 것이 기본 동작이다.
     create_before_destroy argument 는 bool 값을 가지며 true 로 설정하면 이런 경우 먼저 update 된 resource 를 생성하고 기존의 resource 를 삭제하는 방식으로 동작하도록 할 수 있다.
