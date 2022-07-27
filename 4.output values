@@ -1,7 +1,7 @@
 # Output values 란 모듈에서 제공하는 값이며, 다른 모듈에서 그 값을 다양하게 사용하여 Infrastructure 구성에 도움을 준다.
 # 모듈의 return value 라고 생각하면 쉬울 것 같다.
 
-==================================================================
+================================================================
 # main.tf
 resource "aws_iam_user" "example" {
   name  = "test"
@@ -26,7 +26,7 @@ output "hello" {
   value       = "hello"
   description = "hello string"
 }
-==================================================================
+================================================================
 # Output values 는 보통 outputs.tf 파일을 생성하여 선언하며 (물론 파일 이름은 개발자 자유이다) output block 을 통해 생성할 수 있다.
 # output 의 이름은 다른 것들과 마찬가지로 다른 output 의 이름과 중복 되어서는 안된다.
 # 사용할 수 있는 Arguments 에 대해서 살펴보면
@@ -43,7 +43,7 @@ output "hello" {
 
 ### 사용방법
 # 위에 있는 예제 파일을 생성하고 terraform init 이후 terraform apply 를 실행해 보자. 아래와 같은 출력 결과를 얻을 수 있다.
-==================================================================
+================================================================
 $ terraform apply
 
 An execution plan has been generated and is shown below.
@@ -87,7 +87,7 @@ custom_name = custom-test
 hello = hello
 user_arn = arn:aws:iam::111111111111:user/test
 user_name = test
-==================================================================
+================================================================
 # terraform apply 명령어를 통해 "test" IAM user 를 하나 만들었고, 그 이후 코드에서 선언해 놓은 4개의 outputs 가 출력된 걸 볼 수 있다.
 
   # user_name - aws_iam_user.example.name 을 통해 생성된 user 의 name 을 가져와서 출력해 주었으므로 test 가 출력되었다.
