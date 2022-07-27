@@ -1,6 +1,6 @@
 vim main.tf
 
-  provider "aws" {                                #common디렉토리 아래 main.tf를 만듭니다. bucket 이름은 var.bucket_name으로 지정합니다.
+  provider "aws" {                                ### common디렉토리 아래 main.tf를 만듭니다. bucket 이름은 var.bucket_name으로 지정합니다.
   #  profile = "your profile"
     region = "ap-northeast-2"
   }
