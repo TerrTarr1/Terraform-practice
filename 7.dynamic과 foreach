@@ -1,3 +1,5 @@
+vim s3.tf
+
 resource "aws_s3_bucket" "this" {           # 내부 블락을 여러개 만들때 사용하기
   bucket = "frozen-bucket"
   dynamic "lifecycle_rule" {
@@ -21,3 +23,5 @@ variable "my_lifecycle_rule" {
     }
   ]
 }
+
+:wq
